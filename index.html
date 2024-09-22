@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mine sweeper </title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body onload="onInit(4)">
+
+  <h1>Mine Sweeper</h1>
+
+<div class="game-statuses">
+  <div class="lives">lives : <span>❤️❤️❤️</span></div>
+  <div class="hints">hints : <span>💡💡💡</span></div>
+  <div class="restart"><button onclick="onInit()">😃</button></div>
+  <div class="timer">00:00</div>
+</div> 
+
+    <table class="board-container" >
+        <tbody class="board" on></tbody>
+    </table>
+
+    <div>
+      <button onclick="onInit(4)">Beginner</button>
+      <button onclick="onInit(8)">Medium</button>
+      <button onclick="onInit(12)">Expert</button>
+    </div>
+
+    <footer> eliad haim</footer>
+    
+    <script src="js/game.js"></script>
+    <script src="js/timer.js"></script>
+    <script src="js/bonusFeatures.js"></script>
+    <script src="js/utils.js"></script>
+
+</body>
+</html>
