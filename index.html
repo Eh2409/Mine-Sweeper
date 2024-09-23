@@ -26,11 +26,18 @@
       <button onclick="onInit(8)">Medium</button>
       <button onclick="onInit(12)">Expert</button>
     </div>
+    <div class="safe-click"><button onclick="onSafeClick()">safe-click</button> safe click left: <span class="count-safe-click">3</span> </div>
+    <div class="score" onload="displayScore()">00</div>
+    <button>mega hint * under construction *</button>
+    <button onclick="onMineExterminator()">mine exterminator 🐕‍🦺</button>
+    <button onclick="onSetMineMode()">set mine mode</button>
+    <button class="play-set-main hide" onclick="onPlaySetMineMode(this)">play</button>
 
     <footer> eliad haim</footer>
     
     <script src="js/game.js"></script>
     <script src="js/timer.js"></script>
+    <script src="js/setMineMode.js"></script>
     <script src="js/bonusFeatures.js"></script>
     <script src="js/utils.js"></script>
 

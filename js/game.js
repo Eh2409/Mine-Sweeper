@@ -19,20 +19,19 @@ var gGame
 var isMineOnBoard
 var lestSize
 
+// Preparation for the UNDO button
+// var gHistory
+
 function onInit(baordSize = lestSize) {
     gGame = {
         isOn: true,
         shownCount: 0,
         markedCount: 0,
         secsPassed: 0,
-        lives: 3,
-        hints: 3
        }
-
-     gLevel = {
-        SIZE: baordSize,
-        MINES: minesNum (baordSize)
-    }
+    
+    // The board size is passed to the function that determines the level properties
+    gLevel = updateLevelProperties(baordSize)
 
     gBoard = buildBoard(gLevel.SIZE)
     console.table(gBoard)
@@ -43,29 +42,57 @@ function onInit(baordSize = lestSize) {
     lifeCount()
     hintCount()
     resetTimer()
+    safeClickCount()
 
     // If the player clicked the restart button the game will always remember what board level he was on
     lestSize = baordSize
-
+    
+    // If the player has reset the game or selected a different difficulty level after entering SetMineMode, these settings will take them out of this mode
+    if (gSetMineMode || isMinesAreSet) {
+    const elPlaySetMineBtn = document.querySelector('.play-set-main')
+    elPlaySetMineBtn.classList.add('hide')
+    gSetMineMode = false
+    isMinesAreSet = false
+    }
+    
 }
 
-function minesNum(baordSize) {
+function updateLevelProperties(baordSize) {
+    var res = []
     switch (baordSize) {
         case 4:
-            var num = 4 
+            res = {
+                SIZE: 4,
+                MINES: 2,
+                LIVES:1,
+                HINTS:1,
+                SAFE_CLICK:1,
+            }
             break;
     
         case 8:
-            var num = 14 
+            res = {
+                SIZE: 8,
+                MINES: 14,
+                LIVES:2,
+                HINTS:2,
+                SAFE_CLICK:2,
+            }
             break;
 
         case 12:
-            var num = 32 
+            res = {
+                SIZE: 12,
+                MINES: 32,
+                LIVES:3,
+                HINTS:3,
+                SAFE_CLICK:3,
+            }
             break;
 
     }
 
-    return num
+    return res
 }
 
 function buildBoard(size) {
@@ -132,7 +159,8 @@ function renderBoard(board) {
             const className = `cell cell-${i}-${j}`
 
             strHTML += `<td class="${className} covered" 
-            onclick=" onCellClicked(this,${i},${j})" 
+            onclick=" onCellClicked(this,${i},${j})
+            onCellClickedSetMine(this,${i},${j})" 
             onmousedown= "onCellMarked(this,${i},${j})"
             title="${className}">
             </td>`
@@ -166,6 +194,10 @@ function updateRestartButtonSmiley(emotion = 'smiley') {
             elRestart.innerText = SMILEY_WIN
             break;
 
+        case 'set mine mode':
+            elRestart.innerText = SET_MINE_MODE
+            break;
+
         default:
             break;
     }
@@ -182,7 +214,6 @@ function setMinesNegsCount() {
             // Checks in a function how many neighboring mines the cell has and updates the information in the cell
             var mineNum = neighborMinesCount(i,j)
             gBoard[i][j].minesAroundCount = mineNum
-
         }  
     } 
 }
@@ -282,31 +313,33 @@ function onCellClicked(elCell,i,j) {
 }
 
 function expandShown(board, elCell,rowIdx, colIdx) {
-      for (let i = rowIdx-1; i <= rowIdx +1 ; i++) {
-  
-          if (i < 0 || i >= board.length) continue
-  
-          for (let j = colIdx -1; j <= colIdx +1; j++) {
-              const elCurrCell =  document.querySelector(`.cell-${i}-${j}`)
-  
-              if (j < 0 || j >= board[i].length) continue
-              if (i === rowIdx && j === colIdx && gBoard[i][j].minesAroundCount === 0 && !board[i][j].isShown){
+    // When the player clicks on a cell with 0 neighboring mines, all the cells surrounding it will open until we reach a cell with neighboring mines
+
+    for (let i = rowIdx-1; i <= rowIdx +1 ; i++) {
+
+        if (i < 0 || i >= board.length) continue
+
+         for (let j = colIdx -1; j <= colIdx +1; j++) {
+            const elCurrCell =  document.querySelector(`.cell-${i}-${j}`)
+
+            if (j < 0 || j >= board[i].length) continue
+            if (i === rowIdx && j === colIdx && gBoard[i][j].minesAroundCount === 0 && !board[i][j].isShown){
                 // Updates that the cell is shown
                 gBoard[i][j].isShown = true
                 gGame.shownCount++
-                
+
                 //Updates the DOM of the cell
                 elCell.classList.remove('covered')
-                elCell.innerText = gBoard[i][j].minesAroundCount
+                elCell.innerText = ''
 
                 if (gHintMode) {
-                    gHintsAarry.push(elCell)
+                    gElCellAarry.push({elCell: elCell, i: i, j: j})
                 }
-              } else if  (!board[i][j].isMine && !board[i][j].isShown && gBoard[i][j].minesAroundCount === 0 && !board[i][j].isMarked ) {
 
+            } else if  (!board[i][j].isMine && !board[i][j].isShown && gBoard[i][j].minesAroundCount === 0 && !board[i][j].isMarked ) {
                 expandShown(board, elCurrCell,i, j)
 
-              } else if (!board[i][j].isMine && !board[i][j].isShown && gBoard[i][j].minesAroundCount > 0 && !board[i][j].isMarked){
+            } else if (!board[i][j].isMine && !board[i][j].isShown && gBoard[i][j].minesAroundCount > 0 && !board[i][j].isMarked){
                 // Updates that the cell is shown
                 gBoard[i][j].isShown = true
                 gGame.shownCount++
@@ -316,12 +349,11 @@ function expandShown(board, elCell,rowIdx, colIdx) {
                 elCurrCell.innerText = gBoard[i][j].minesAroundCount
 
                 if (gHintMode) {
-                    gHintsAarry.push(elCurrCell)
+                    gElCellAarry.push({elCell: elCurrCell, i: i, j: j})
                 }
-              }
-          }
-      }
-      return
+            }
+        }
+    }
 }
 
 function onCellMarked(elCell,i,j){
@@ -366,12 +398,12 @@ function onCellMarked(elCell,i,j){
 
 function lifeCount(diff = 0) {
     // Updates the amount of lives
-    gGame.lives-=diff
+    gLevel.LIVES-=diff
 
     // Updates the DOM
      var strHTML = ''
 
-     for (let i = 0; i < gGame.lives; i++) {
+     for (let i = 0; i < gLevel.LIVES; i++) {
         strHTML += LIFE
      }
      console.log(strHTML);
@@ -387,7 +419,7 @@ function checkGameOver()  {
      const boardSize = Math.pow (gLevel.SIZE,2)
 
      //Checks if the player has lost
-     if (gGame.lives === 0) {
+     if (gLevel.LIVES === 0) {
         gGame.isOn = false
         console.log('game end');
 
@@ -395,7 +427,8 @@ function checkGameOver()  {
         updateRestartButtonSmiley('lose')
         stopTimer()
      }
-     
+
+     console.log(gLevel.MINES);
      console.log(gGame.shownCount);
      console.log(gGame.markedCount);
      console.log(boardSize);
@@ -418,22 +451,24 @@ function UpdateLoseDOM() {
             const elCurrCell =  document.querySelector(`.cell-${i}-${j}`)
 
             // Locates and displays all hidden mines
-            if (gBoard[i][j].isMine && !gBoard[i][j].isShown ||
-                gBoard[i][j].isMine && gBoard[i][j].isMarked ) {
-            elCurrCell.classList.remove('covered')
-            elCurrCell.innerText = MINE_NOT_ON
+            if (gBoard[i][j].isMine && !gBoard[i][j].isShown) {
+                elCurrCell.classList.remove('covered')
+                elCurrCell.innerText = MINE_NOT_ON
+            }
+
+            if (gBoard[i][j].isMine && gBoard[i][j].isMarked) {
+                elCurrCell.classList.remove('covered')
+                elCurrCell.classList.add('correct-mark')
+                elCurrCell.innerText = MINE_NOT_ON
             }
             
             // Checks and shows whether marked cells do not have a mine under them
             if (!gBoard[i][j].isMine && gBoard[i][j].isMarked) {
-            elCurrCell.classList.remove('covered')
-            elCurrCell.innerText = NOT_A_MINE
+                elCurrCell.classList.remove('covered')
+                elCurrCell.innerText = NOT_A_MINE
             }
 
         }  
     }
 } 
 
-
-
-  
