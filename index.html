@@ -6,37 +6,61 @@
     <title>mine sweeper </title>
     <link rel="stylesheet" href="css/main.css">
 </head>
-<body onload="onInit(4)">
+<body onload="onInit(4), runderResults()">
 
   <h1>Mine Sweeper</h1>
+  
+<div class="main-bar">
 
-<div class="game-statuses">
-  <div class="lives">lives : <span>❤️❤️❤️</span></div>
-  <div class="hints">hints : <span>💡💡💡</span></div>
-  <div class="restart"><button onclick="onInit()">😃</button></div>
-  <div class="timer">00:00</div>
-</div> 
+  <div class="left-side">
+    <input type="text" class="player-name" placeholder="Enter your name">
+    <div class="mine-mark-status">💣 <span class="mine-num">0</span> 🚩 <span class="mark-num">0</span></div>
 
-    <table class="board-container" >
-        <tbody class="board" on></tbody>
-    </table>
+  </div>
 
-    <div>
-      <button onclick="onInit(4)">Beginner</button>
-      <button onclick="onInit(8)">Medium</button>
-      <button onclick="onInit(12)">Expert</button>
-    </div>
-    <div class="safe-click"><button onclick="onSafeClick()">safe-click</button> safe click left: <span class="count-safe-click">3</span> </div>
-    <div class="score" onload="displayScore()">00</div>
-    <button>mega hint * under construction *</button>
-    <button onclick="onMineExterminator()">mine exterminator 🐕‍🦺</button>
-    <button onclick="onSetMineMode()">set mine mode</button>
-    <button class="play-set-main hide" onclick="onPlaySetMineMode(this)">play</button>
+  <div class="middle">
+    <div class="restart"><button onclick="onInit()">😃</button></div>
+  </div>
 
-    <footer> eliad haim</footer>
+  <div class="right-side">
+    <div class="lives">Lives : <span>❤️</span></div>
+    <div>⏰ <span class="timer">00:00:000</span></div>
+  </div>
+  
+</div>
+
+<div class="tools">
+  <div><button onclick="onUndo()" class="undo-btn">Undo ⟳</button></div>
+  <div class="hints">Hints : <br> <span>💡</span></div>
+  <div class="mine-exterminator">Mine exterminator : <br> <span>🐕‍🦺</span></div>
+  <div class="safe-click"><button onclick="onSafeClick()">Safe-click</button> <br>  safe click left: <span class="count-safe-click">3</span> </div>
+  <div class="mega-hint"><button onclick="onMegaHint()">Mega hint</button></div>
+</div>
+
+<div class="levels">
+  <button onclick="onInit(4)" class="beginner">Beginner</button>
+  <button onclick="onInit(8)" class="medium">Medium</button>
+  <button onclick="onInit(12)" class="expert">Expert</button>
+  <button onclick="onSetMineMode()" class="set-mine-mode">Set mine mode</button>
+  <button class="play-set-main hide" onclick="onPlaySetMineMode(this)">play!</button>
+</div>
+
+
+  <table class="board-container">
+  <tbody class="board"></tbody>
+</table>
+
+<div class="score-box">
+
+  <div class="top-scores">Top scores: <span></span></div>
+
+  <div class="scoreboard"></div>
+</div>
+    
+
+    <footer> Eliad haim</footer>
     
     <script src="js/game.js"></script>
-    <script src="js/timer.js"></script>
     <script src="js/setMineMode.js"></script>
     <script src="js/bonusFeatures.js"></script>
     <script src="js/utils.js"></script>

@@ -1,11 +1,178 @@
 
 body {
-    background-color: rgb(0, 214, 150);
+    background-color: rgb(16, 202, 248);
+    background-image: url(../img/back.png);
     color:white;
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
   }
+
+  button {
+    cursor: pointer;
+    border-radius: 10px;
+    border: solid 2px rgb(0, 2, 116);
+  }
+
+  button:hover{
+    filter: brightness(1.1)
+   }
+
   
+  /* -----   main bar -------    */
+
+  .main-bar {
+    background-color: rgb(0, 0, 167,50%);
+    display: flex;
+    flex-direction:row;
+    justify-content: center;  
+    padding: 4px;
+    width: 700px;
+    margin: auto;
+    border-radius: 10px 10px 0 0 ;
+  }
+
+  .left-side{
+    width: 40%;
+    font-weight: bold;
+  }
+  .left-side input {
+    border-radius: 20px;
+    padding-left: 20px;
+    height: 20px;
+  }
+
+  .mine-mark-status{
+    margin-top: 5px;
+  }
+  .mine-mark-status span {
+    background-color: rgb(104, 157, 255);
+    padding: 4px 8px;
+    border-radius: 5px;
+    margin-right: 10px;
+    box-shadow: inset 0 0 10px rgba(0, 45, 129, 0.61);
+  }
+
+  .middle{
+    width: 30%;
+  }
+
+  .restart button{
+    font-size: 35px;
+    border-radius: 0
+  }
+
+  .right-side{
+    width: 40%;
+    font-weight: bold;
+  }
+
+  .lives {
+    margin-bottom: 5px;
+  }
+  .lives span {
+    font-size: 20px;
+  }
+
+/* -------  tools ------  */
+  .tools{
+    background-color: rgb(0, 0, 167,30%);
+    display: flex;
+    flex-direction:row;
+    justify-content: center;  
+    align-items: center;
+    padding: 4px;
+    width: 700px;
+    margin: auto;
+    font-weight: bold;
+  }
+
+  .tools div {
+    margin-left: 20px;
+  }
+
+  .undo-btn {
+    background-color: rgb(18, 120, 255);
+    color: white;
+    font-size: 20px;
+    padding: 7px;
+    font-weight: bold;
+  }
+
+  .hints span {
+    font-size: 25px;
+    cursor: pointer;
+  }
+
+  .mine-exterminator span{
+    font-size: 25px;
+    cursor: pointer;
+  }
+
+  .safe-click button{
+    background-color: rgb(0, 160, 67);
+    color: white;
+    font-size: 20px;
+    padding: 7px;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+
+  .mega-hint button{
+    background-color: rgb(255, 138, 5);
+    color: white;
+    font-size: 20px;
+    padding: 7px;
+    font-weight: bold;
+  }
+  
+
+  /* ------------- levels -------- */
+
+  .levels {
+    background-color: rgb(0, 0, 0,30%);
+    padding: 5px 4px;
+    width: 700px;
+    border-radius: 0 0 10px 10px ;
+    margin: auto ;
+    margin-bottom: 5px;
+  }
+
+  .levels button{
+    margin-right: 20px;
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .levels button {
+    color: white;
+    font-size: 20px;
+    padding: 7px;
+    font-weight: bold;
+  }
+
+  .beginner{
+    background-color: rgb(6, 182, 0);
+  }
+
+  .medium{
+    background-color: rgb(196, 183, 0);
+  }
+
+  .expert{
+    background-color: rgb(206, 63, 19);
+  }
+
+  .set-mine-mode{
+    background-color: rgb(114, 1, 158);
+  }
+
+  .play-set-main{
+    background-color: rgb(2, 69, 255);
+  }
+
+
+  /* ------ board ----- */
+
   .board-container {
     margin: auto;
     background-color: black;
@@ -15,8 +182,8 @@ body {
     background-color: rgb(29, 25, 255);
     font-size: 20px;
     font-weight: bold;
-    width: 50px;
-    height: 50px;
+    width: 30px;
+    height: 30px;
     padding: 0;
   }
   
@@ -32,19 +199,6 @@ body {
     background-color: rgb(159, 236, 255);
   }
 
-  .lives {
-    font-size: 20px;
-  }
-  
-  .hints {
-    font-size: 20px;
-    cursor: pointer;
-  }
-  
-  .restart button{
-    font-size: 35px;
-  }
-
   .covered {
     background-color: rgb(27, 152, 255);
     box-shadow: inset 6px 6px 10px 0 rgba(250, 247, 247, 0.507), inset -6px -6px 10px 0 rgba(0, 0, 0, 0.5); 
@@ -57,10 +211,37 @@ body {
     cursor: pointer;
   }
 
+  /* scoreboard */
+
+  .score-box {
+    background-color: rgb(0, 0, 167,50%);
+    display: flex;
+    flex-direction:column;
+    justify-content: center;  
+    padding: 8px 4px;
+    width: 700px;
+    margin: auto;
+    border-radius: 10px ;
+    margin-top: 20px;
+  }
+
+  .top-scores{
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+
+
   footer {
+    background-color: rgb(0, 0, 167,20%);
     margin-top: 20px;
     color: black;
-    font-size: 30px;
+    font-size: 20px;
+    padding: 8px 4px;
+    width: 700px;
+    margin: auto;
+    border-radius: 10px ;
+    margin-top: 20px;
   }
 
   .hide {

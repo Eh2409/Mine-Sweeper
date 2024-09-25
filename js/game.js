@@ -13,16 +13,21 @@ const SMILEY_LOSE = '☠️'
 const MINE_NOT_ON = '💣'
 const NOT_A_MINE = '❌'
 
+// Model:
 var gBoard 
 var gLevel 
 var gGame 
-var isMineOnBoard
+var gIsMineOnBoard
 var lestSize
 
-// Preparation for the UNDO button
-// var gHistory
+// Undo:
+var gHistory = []
+var gCellsOpenArry = []
+
 
 function onInit(baordSize = lestSize) {
+
+    //Resets game settings
     gGame = {
         isOn: true,
         shownCount: 0,
@@ -30,63 +35,94 @@ function onInit(baordSize = lestSize) {
         secsPassed: 0,
        }
     
-    // The board size is passed to the function that determines the level properties
-    gLevel = updateLevelProperties(baordSize)
+    // The board size is passed to the function that determines the level settings
+    gLevel = updateLevelSettings (baordSize)
 
+    // Builds and renders the board
     gBoard = buildBoard(gLevel.SIZE)
     console.table(gBoard)
     renderBoard(gBoard)
+    adjustCellSize (baordSize)
+    
+    displayMine()
+    displayMarkNum()
 
-    isMineOnBoard = false
-    updateRestartButtonSmiley()
+    // Render the results of the players
+    runderResults(gLevel.LEVEL)
+
+    // Resets all game settings
+    gIsMineOnBoard = false
+    updateRestartBtnSmiley()
     lifeCount()
     hintCount()
+    mineExterminatorCount()
     resetTimer()
     safeClickCount()
+
+    // Resets game history
+    gHistory = []
 
     // If the player clicked the restart button the game will always remember what board level he was on
     lestSize = baordSize
     
     // If the player has reset the game or selected a different difficulty level after entering SetMineMode, these settings will take them out of this mode
-    if (gSetMineMode || isMinesAreSet) {
+    if (gSetMineMode || gIsMinesAreSetOn) {
     const elPlaySetMineBtn = document.querySelector('.play-set-main')
     elPlaySetMineBtn.classList.add('hide')
     gSetMineMode = false
-    isMinesAreSet = false
+    gIsMinesAreSetOn = false
+    }
+    
+    // If the player resets the game or switches to a different difficulty level in the middle of running the mega hint mod, this setting will reset the mod
+    if (gIsMegaHintOn) {
+        gIsMegaHintOn = false
+        gClickCount = 0
+        gMegaHintPose = []
     }
     
 }
 
-function updateLevelProperties(baordSize) {
+function updateLevelSettings (baordSize) {
+    /// This function defines the level settings of the game
+
     var res = []
     switch (baordSize) {
         case 4:
             res = {
+                LEVEL: 'Beginner',
                 SIZE: 4,
                 MINES: 2,
                 LIVES:1,
                 HINTS:1,
                 SAFE_CLICK:1,
+                MINE_EXTERMINATOR: 1,
+                MEGA_HINT:1
             }
             break;
     
         case 8:
             res = {
+                LEVEL: 'Medium',
                 SIZE: 8,
                 MINES: 14,
                 LIVES:2,
                 HINTS:2,
                 SAFE_CLICK:2,
+                MINE_EXTERMINATOR: 2,
+                MEGA_HINT:1
             }
             break;
 
         case 12:
             res = {
+                LEVEL: 'Expert',
                 SIZE: 12,
                 MINES: 32,
                 LIVES:3,
                 HINTS:3,
                 SAFE_CLICK:3,
+                MINE_EXTERMINATOR: 3,
+                MEGA_HINT:1
             }
             break;
 
@@ -159,7 +195,7 @@ function renderBoard(board) {
             const className = `cell cell-${i}-${j}`
 
             strHTML += `<td class="${className} covered" 
-            onclick=" onCellClicked(this,${i},${j})
+            onclick=" onCellClicked(this,${i},${j}),
             onCellClickedSetMine(this,${i},${j})" 
             onmousedown= "onCellMarked(this,${i},${j})"
             title="${className}">
@@ -172,7 +208,31 @@ function renderBoard(board) {
     elContainer.innerHTML = strHTML 
 }
 
-function updateRestartButtonSmiley(emotion = 'smiley') {  
+function adjustCellSize (baordSize) {
+    const elCells = document.querySelectorAll('.cell')
+
+    switch (baordSize) {
+      case 4:
+        var size = 50
+        break;
+
+      case 8:
+        var size = 40
+        break;
+
+      case 12:
+        var size = 35
+        break;
+    }
+
+    for (let i = 0; i < elCells.length; i++) {
+      var currElCell = elCells[i]
+      currElCell.style.width = size +'px'
+      currElCell.style.height = size +'px'
+    }
+}
+
+function updateRestartBtnSmiley(emotion = 'smiley') {  
     const elRestart = document.querySelector('.restart button')
 
     // Checks what the emotion is and updates the DOM
@@ -196,9 +256,6 @@ function updateRestartButtonSmiley(emotion = 'smiley') {
 
         case 'set mine mode':
             elRestart.innerText = SET_MINE_MODE
-            break;
-
-        default:
             break;
     }
     
@@ -241,73 +298,125 @@ function onCellClicked(elCell,i,j) {
     // Checks after clicking on a cell if the game is on and that the cell is not marked 
     if (!gGame.isOn) return
     if (elCell.isMarked) return
-    if (gHintMode) {
+
+    //----- ON HINT MODE ----------
+    // If hint mode is on, passes the location of the clicked cell to another function
+    if (gIsHintModeOn) {
         onCellClickedHintMode (elCell,i,j) 
         return
     }
 
+
+     //----- ON MEGA HINT MODE ----------
+    // If mega hint mode is on, passes the location of the clicked cells to another function
+    if (gIsMegaHintOn) {
+        var pos = {i:i ,j:j}
+        gMegaHintPose.push(pos)
+        gClickCount++
+        if (gClickCount === 2) SetPosDirection (gMegaHintPose)
+        return
+    }
+
+
+    /// ---- The first cell the player opens ------
+
     // Checks if this is the player's first click on a cell on the board so that the first cell does not contain mines and in order to scatter the mines on the board
-    if (!isMineOnBoard && !gBoard[i][j].isMarked) {
+    if (!gIsMineOnBoard && !gBoard[i][j].isMarked) {
+
         // Passes the location of the first clicked cell to the mine scatter function
         var firstClickPos = {i: i ,j: j }
         setMines(firstClickPos) 
-        isMineOnBoard = true
+        gIsMineOnBoard = true
+
+        // Starts the timer
         onTimer()
 
+        // Opens the selected cell
         if (gBoard[i][j].minesAroundCount === 0) {
+            // A function that opens all neighboring cells to a cell that has zero neighboring cells with a mine
             expandShown(gBoard, elCell,i, j)
-            
-        } else {
-            // Updates the amount of neighboring mines on the cell
-             elCell.innerText = gBoard[i][j].minesAroundCount
 
-             // Updates that the cell is shown
+            // Receives an array of all opened cells and saves it in the history array, in order to allow the undo button to go back
+            gHistory.push(gCellsOpenArry)
+            gCellsOpenArry = []
+
+        } else {
+            // Updates the MODAL
              gGame.shownCount++
              gBoard[i][j].isShown = true
+             
+             // update the DOM
+             elCell.classList.remove('covered')
+             elCell.innerText = gBoard[i][j].minesAroundCount
 
-              // Removes the cover from the cell
-              elCell.classList.remove('covered')
+             // Updates the opened cell in the history array
+             gHistory.push({elCell: elCell, i: i, j: j})
         }
     }
 
+
+    /// -----  Opening process of normal cells ----
+
     // Checks that the cell is not shown yet
-    if (!gBoard[i][j].isShown && !gBoard[i][j].isMarked &&!gHintMode) {
+    if (!gBoard[i][j].isShown && !gBoard[i][j].isMarked &&!gIsHintModeOn) {
         // Checks that the cell does not contain a mine
+
         if (!gBoard[i][j].isMine) {
             if (gBoard[i][j].minesAroundCount === 0) {
+                // A function that opens all neighboring cells to a cell that has zero neighboring cells with a mine
                 expandShown(gBoard, elCell,i, j)
+
+                // Passes the location of the first clicked cell to the mine scatter function
+                gHistory.push(gCellsOpenArry)
+                gCellsOpenArry = []
+
             } else {
-                // Updates that the cell is shown
+
+                // Updates the MODAL
                 gBoard[i][j].isShown = true
                 gGame.shownCount++
 
-                //Updates the DOM of the cell
+                // update the DOM
                 elCell.classList.remove('covered')
                 elCell.innerText = gBoard[i][j].minesAroundCount 
+
+                // Updates the opened cell in the history array
+                gHistory.push({elCell: elCell, i: i, j: j})
             }
 
-            updateRestartButtonSmiley()
+            // Updates the smiley emoji
+            updateRestartBtnSmiley()
 
         } else {
-            // Updates that the cell is shown
+            // Updates the MODAL
             gBoard[i][j].isShown = true
             gGame.shownCount++
 
-            //Updates the DOM of the cell
+            // update the DOM
             elCell.classList.remove('covered')
             elCell.classList.add('mine')
             elCell.innerText = MINE
 
             // Removes the mine from the number of mines to calculate the victory later
-            gLevel.MINES -= 1
+            gLevel.MINES --
+            displayMine()
 
             // Updates life due to clicking on a mine
             lifeCount(1)
 
-            updateRestartButtonSmiley('mine')
+            // Updates the opened cell in the history array
+            gHistory.push({elCell: elCell, i: i, j: j})
+
+            // Updates the smiley emoji
+            updateRestartBtnSmiley('mine')
+
+
         } 
     }
     
+     console.log(gHistory);
+     
+
     // Checks with each cell click if the game is over
     checkGameOver()
 }
@@ -324,32 +433,44 @@ function expandShown(board, elCell,rowIdx, colIdx) {
 
             if (j < 0 || j >= board[i].length) continue
             if (i === rowIdx && j === colIdx && gBoard[i][j].minesAroundCount === 0 && !board[i][j].isShown){
-                // Updates that the cell is shown
+
+                // Updates the MODAL
                 gBoard[i][j].isShown = true
                 gGame.shownCount++
 
-                //Updates the DOM of the cell
+                // update the DOM
                 elCell.classList.remove('covered')
                 elCell.innerText = ''
 
-                if (gHintMode) {
-                    gElCellAarry.push({elCell: elCell, i: i, j: j})
+                // Builds an array of opened cells to update in the history array later
+                gCellsOpenArry.push({elCell: elCell, i: i, j: j})
+
+                // If hint mode is active, saves all the opened cells in the array in order to be able to open and close them through the onCellClickedHintMode function
+                if (gIsHintModeOn) {
+                    gCellsHintAarry.push({elCell: elCell, i: i, j: j})
                 }
 
             } else if  (!board[i][j].isMine && !board[i][j].isShown && gBoard[i][j].minesAroundCount === 0 && !board[i][j].isMarked ) {
+
+                // Puts the function into recursion mode to open all neighboring cells that have 0 neighboring mines
                 expandShown(board, elCurrCell,i, j)
 
             } else if (!board[i][j].isMine && !board[i][j].isShown && gBoard[i][j].minesAroundCount > 0 && !board[i][j].isMarked){
-                // Updates that the cell is shown
+
+                // Updates the MODAL
                 gBoard[i][j].isShown = true
                 gGame.shownCount++
 
-                //Updates the DOM of the cell
+                // update the DOM
                 elCurrCell.classList.remove('covered')
                 elCurrCell.innerText = gBoard[i][j].minesAroundCount
 
-                if (gHintMode) {
-                    gElCellAarry.push({elCell: elCurrCell, i: i, j: j})
+                // Builds an array of opened cells to update in the history array later
+                gCellsOpenArry.push({elCell: elCurrCell, i: i, j: j})
+
+                // If hint mode is active, saves all the opened cells in the array in order to be able to open and close them through the onCellClickedHintMode function
+                if (gIsHintModeOn) {
+                    gCellsHintAarry.push({elCell: elCurrCell, i: i, j: j})
                 }
             }
         }
@@ -374,6 +495,7 @@ function onCellMarked(elCell,i,j){
 
         gBoard[i][j].isMarked = true
         gGame.markedCount++
+        displayMarkNum()
 
         elCell.innerText = MARK
 
@@ -385,14 +507,15 @@ function onCellMarked(elCell,i,j){
 
         gBoard[i][j].isMarked = false
         gGame.markedCount--
-
+        displayMarkNum()
+        
         elCell.innerText = '' 
 
         checkGameOver()
     }
 
     if (gGame.isOn) {
-        updateRestartButtonSmiley()
+        updateRestartBtnSmiley()
     }
 }
 
@@ -413,39 +536,37 @@ function lifeCount(diff = 0) {
 }
 
 function checkGameOver()  {
-    
     // A function that checks for a win or loss
+    
 
      const boardSize = Math.pow (gLevel.SIZE,2)
 
-     //Checks if the player has lost
+     //Checks if the player has lost or win
      if (gLevel.LIVES === 0) {
         gGame.isOn = false
         console.log('game end');
-
         UpdateLoseDOM()
-        updateRestartButtonSmiley('lose')
+        updateRestartBtnSmiley('lose')
         stopTimer()
-     }
 
-     console.log(gLevel.MINES);
-     console.log(gGame.shownCount);
-     console.log(gGame.markedCount);
-     console.log(boardSize);
-     
-
-     // Checks if the player has won
-    if ( gGame.markedCount === gLevel.MINES &&
+     }else if ( gGame.markedCount === gLevel.MINES &&
         gGame.shownCount + gGame.markedCount === boardSize){
+         // Checks if the player has won
+
         gGame.isOn = false
         console.log('game end');
-        updateRestartButtonSmiley('win')
+        updateRestartBtnSmiley('win')
         stopTimer()
+
+        // When the player wins saves his data to update his score
+        makePlayerData()
     }
 
 }
 
 function UpdateLoseDOM() {
+    //In a losing situation, the board will open and show all the mines left on the board, and all the places where the player marked there is a mine
+
     for (let i = 0; i < gBoard.length; i++) {
         for (let j = 0; j < gBoard[0].length; j++) {
             const elCurrCell =  document.querySelector(`.cell-${i}-${j}`)
@@ -456,6 +577,7 @@ function UpdateLoseDOM() {
                 elCurrCell.innerText = MINE_NOT_ON
             }
 
+            // Shows all the cells in which the player marked that there is a mine and shows that he was right
             if (gBoard[i][j].isMine && gBoard[i][j].isMarked) {
                 elCurrCell.classList.remove('covered')
                 elCurrCell.classList.add('correct-mark')
@@ -472,3 +594,19 @@ function UpdateLoseDOM() {
     }
 } 
 
+function makePlayerData() {
+
+    // Collects the player name
+    const elPlayerNameInput = document.querySelector('.player-name')
+    var playerName = (!elPlayerNameInput.value)? 'guest' : elPlayerNameInput.value
+
+    // Updates the player data
+    var playerData = {
+        level: gLevel.LEVEL,
+        playerName : playerName,
+        score : gGame.secsPassed
+    }
+
+    //Sends the data information of the player to update the results
+    updateScoreArry (playerData)
+}

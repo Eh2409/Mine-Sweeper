@@ -3,7 +3,7 @@
 const SET_MINE_MODE = '🤫' 
 
 var gSetMineMode = false
-var isMinesAreSet = false
+var gIsMinesAreSetOn = false
 
 
 function onSetMineMode() {
@@ -12,16 +12,16 @@ function onSetMineMode() {
     gSetMineMode = true
     gGame.isOn = false
     gLevel.MINES = 0
+    displayMine()
 
     renderBoardSetMineMode()
-    updateRestartButtonSmiley('set mine mode') 
+    updateRestartBtnSmiley('set mine mode') 
 }
-
 
 function renderBoardSetMineMode() {
     // A function whose purpose is to update the design of the board according to the game mode
 
-    if (!isMinesAreSet) {
+    if (!gIsMinesAreSetOn) {
         for (let i = 0; i < gBoard.length; i++) {
             for (let j = 0; j < gBoard[0].length; j++) {
                 const currElCell = document.querySelector(`.cell-${i}-${j}`)  
@@ -29,7 +29,7 @@ function renderBoardSetMineMode() {
                 currElCell.classList.add('set-mine')
             } 
         }
-    } else if (isMinesAreSet){
+    } else if (gIsMinesAreSetOn){
         for (let i = 0; i < gBoard.length; i++) {
             for (let j = 0; j < gBoard[0].length; j++) {
                 const currElCell = document.querySelector(`.cell-${i}-${j}`)  
@@ -51,6 +51,7 @@ function onCellClickedSetMine(elCell,i,j){
 
         gBoard[i][j].isMine = true
         gLevel.MINES++
+        displayMine()
 
         elCell.innerText = MINE_NOT_ON
 
@@ -58,6 +59,7 @@ function onCellClickedSetMine(elCell,i,j){
 
         gBoard[i][j].isMine = false
         gLevel.MINES--
+        displayMine()
 
         elCell.innerText = ''
     }
@@ -67,10 +69,10 @@ function onCellClickedSetMine(elCell,i,j){
 
     const elPlaySetMineBtn = document.querySelector('.play-set-main')
     if (gLevel.MINES > 0) {
-        isMinesAreSet = true
+        gIsMinesAreSetOn = true
         elPlaySetMineBtn.classList.remove('hide')
     } else if (gLevel.MINES === 0){
-        isMinesAreSet = false
+        gIsMinesAreSetOn = false
         elPlaySetMineBtn.classList.add('hide')
     }
     
@@ -83,13 +85,13 @@ function onPlaySetMineMode(elPlaySetMineBtn) {
 
     setMinesNegsCount()
     renderBoardSetMineMode()
-    updateRestartButtonSmiley() 
+    updateRestartBtnSmiley() 
 
     gSetMineMode = false
-    isMinesAreSet = false
+    gIsMinesAreSetOn = false
 
     gGame.isOn = true
-    isMineOnBoard = true
+    gIsMineOnBoard = true
 
     onTimer()
 }
