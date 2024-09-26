@@ -88,13 +88,11 @@ function onCellClickedHintMode (elCell,i,j){
         } else {
             // update the DOM
             elCell.classList.remove('covered')
-            elCell.classList.add('mine')
-            elCell.innerText = MINE
+            elCell.innerText = MINE_NOT_ON
 
             setTimeout(() => {
 
             // update the DOM
-            elCell.classList.remove('mine')
             elCell.classList.add('covered')
             elCell.innerText = isCellMarked
 
