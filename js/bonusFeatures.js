@@ -107,7 +107,7 @@ function onCellClickedHintMode (elCell,i,j){
 function hideCells(cellsArray) {
    // Goes through the array and hides all opened cells
 
-    console.log(cellsArray);
+    
     for (let i = 0; i < cellsArray.length; i++) {
         var currElCell = cellsArray[i]
 
@@ -205,7 +205,7 @@ function SetPosDirection (Pose) {
 function megaHintShow(firstPos, lastPos) {
     // Opens all cells between the first and last cell that were clicked
 
-    console.log(firstPos, lastPos);
+    
     for (var i = firstPos.i; i <= lastPos.i; i++) { 
       for (var j = firstPos.j; j <= lastPos.j; j++) {
 
@@ -315,7 +315,6 @@ function onUndo() {
     // Every time you click the undo button, the last opened cell is removed from the history array
     var lastMove = gHistory.pop()
 
-    console.log(lastMove);
     
     if (!lastMove.length) {
 
@@ -419,7 +418,6 @@ function sortScoreArray (currLevelArray) {
     // A function that goes through an array and arranges it according to the order of the players' results, from the best result to the least
     currLevelArray.sort((a, b) => a.score - b.score);
 
-    console.log(currLevelArray);
     
     // After sorting, if the size of the array exceeds the amount of results displayed on the site, the purpose of this operation is to remove information that will not be displayed to save data storage size.
     if (currLevelArray.length > 5) {
@@ -452,7 +450,6 @@ function runderResults(level = 'Beginner') {
     for (let i = 0; i < 5; i++) {
         var currPlayerData = currLevelArray[i]
         if (currPlayerData === undefined) break
-        console.log(currPlayerData);
         
         strHTML+= `<div>
         ${i+1}. name: ${currPlayerData.playerName} ----------------------- score: ${formatTime(currPlayerData.score)}
@@ -472,4 +469,18 @@ function displayMine() {
 function displayMarkNum() {
     const elMarkNum = document.querySelector('.mark-num')
     elMarkNum.innerText = gGame.markedCount
+}
+
+// ------  dark mode -------
+
+function onDarkMode(elDarkMode) {
+    const elBody = document.querySelector('body')
+    elBody.classList.toggle('dark-mode')
+    
+    if (elBody.classList.contains('dark-mode')) {
+        elDarkMode.innerHTML = 'Light Mode☀️'
+    } else {
+        elDarkMode.innerHTML = 'Dark Mode🌙'
+    }
+
 }

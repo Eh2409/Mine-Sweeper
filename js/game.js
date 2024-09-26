@@ -40,7 +40,6 @@ function onInit(baordSize = lestSize) {
 
     // Builds and renders the board
     gBoard = buildBoard(gLevel.SIZE)
-    console.table(gBoard)
     renderBoard(gBoard)
     adjustCellSize (baordSize)
     
@@ -168,7 +167,6 @@ function setMines(firstClickPos) {
     // board[3][1].isMine = true 
 
     setMinesNegsCount()
-    console.table(gBoard)
     return
 }
 
@@ -413,9 +411,7 @@ function onCellClicked(elCell,i,j) {
 
         } 
     }
-    
-     console.log(gHistory);
-     
+      
 
     // Checks with each cell click if the game is over
     checkGameOver()
@@ -529,7 +525,6 @@ function lifeCount(diff = 0) {
      for (let i = 0; i < gLevel.LIVES; i++) {
         strHTML += LIFE
      }
-     console.log(strHTML);
      
      var elLives = document.querySelector('.lives span')
      elLives.innerText = strHTML
@@ -544,7 +539,7 @@ function checkGameOver()  {
      //Checks if the player has lost or win
      if (gLevel.LIVES === 0) {
         gGame.isOn = false
-        console.log('game end');
+        
         UpdateLoseDOM()
         updateRestartBtnSmiley('lose')
         stopTimer()
@@ -554,7 +549,7 @@ function checkGameOver()  {
          // Checks if the player has won
 
         gGame.isOn = false
-        console.log('game end');
+      
         updateRestartBtnSmiley('win')
         stopTimer()
 

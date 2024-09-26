@@ -1,6 +1,22 @@
 
+:root {
+  --site-background: rgb(16, 202, 248);
+  --cell-coverd:  rgb(27, 152, 255);
+  --cell: rgb(29, 25, 255);
+  --dark-mode-btn:  rgb(12, 0, 68);
+  --dark-mode-font-color: white;
+}
+
+.dark-mode{
+  --site-background: rgb(60, 62, 167);
+  --cell-coverd:  rgb(0, 57, 243);
+  --cell: rgb(104, 111, 255);
+  --dark-mode-btn:  rgb(255, 136, 0);
+  --dark-mode-font-color: rgb(250, 238, 169);
+}
+
 body {
-    background-color: rgb(16, 202, 248);
+    background-color: var(--site-background);
     background-image: url(../img/back.png);
     color:white;
     text-align: center;
@@ -11,6 +27,17 @@ body {
     cursor: pointer;
     border-radius: 10px;
     border: solid 2px rgb(0, 2, 116);
+  }
+
+  .dark-mode-btn {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background-color: var(--dark-mode-btn);
+    color:var(--dark-mode-font-color);
+    font-size: 20px;
+    padding: 7px;
+    font-weight: bold;
   }
 
   button:hover{
@@ -179,7 +206,7 @@ body {
   }
   
   .cell {
-    background-color: rgb(29, 25, 255);
+    background-color:var(--cell);
     font-size: 20px;
     font-weight: bold;
     width: 30px;
@@ -188,7 +215,7 @@ body {
   }
   
   .mine {
-    background-color: rgb(255, 25, 25);
+    background-color: rgb(250, 61, 61);
   }
   
   .correct-mark{
@@ -200,7 +227,7 @@ body {
   }
 
   .covered {
-    background-color: rgb(27, 152, 255);
+    background-color: var(--cell-coverd);
     box-shadow: inset 6px 6px 10px 0 rgba(250, 247, 247, 0.507), inset -6px -6px 10px 0 rgba(0, 0, 0, 0.5); 
     cursor: pointer;
   }

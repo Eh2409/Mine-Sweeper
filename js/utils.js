@@ -40,11 +40,9 @@ function onTimer() {
       var currentTime = Date.now()
       elapsedTime = currentTime - startTime
 
-
       var timePass = elapsedTime
 
       gGame.secsPassed = timePass
-      console.log(gGame.secsPassed);
 
       isRuning = false
     }
