@@ -473,9 +473,7 @@ function expandShown(board, elCell,rowIdx, colIdx) {
 }
 
 function onCellMarked(elCell,i,j){
-    // Note to myself: check why there is a white bar on the event
-
-
+    
     //Removes the menu when the right mouse button is pressed
     elCell.addEventListener('contextmenu', (event) => {
         event.preventDefault();
