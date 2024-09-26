@@ -195,8 +195,7 @@ function renderBoard(board) {
             strHTML += `<td class="${className} covered" 
             onclick=" onCellClicked(this,${i},${j}),
             onCellClickedSetMine(this,${i},${j})" 
-            onmousedown= "onCellMarked(this,${i},${j})"
-            title="${className}">
+            onmousedown= "onCellMarked(this,${i},${j})">
             </td>`
 
         }
