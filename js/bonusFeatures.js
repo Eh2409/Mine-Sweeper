@@ -322,6 +322,7 @@ function onUndo() {
         if ( gBoard[lastMove.i][lastMove.j].isMine) {
             lastMove.elCell.classList.remove('mine')
             gLevel.MINES ++
+            displayMine()
         }
 
         // Updates the MODAL
@@ -339,6 +340,7 @@ function onUndo() {
             if ( gBoard[currCell.i][currCell.j].isMine) {
                 currCell.elCell.classList.remove('mine')
                 gLevel.MINES ++
+                displayMine()
             }
             
             // Updates the MODAL
