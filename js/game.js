@@ -57,6 +57,8 @@ function onInit(baordSize = lestSize) {
     mineExterminatorCount()
     resetTimer()
     safeClickCount()
+    megaHintCount()
+    displayTools()
 
     // Resets game history
     gHistory = []
@@ -324,6 +326,7 @@ function onCellClicked(elCell,i,j) {
         var firstClickPos = {i: i ,j: j }
         setMines(firstClickPos) 
         gIsMineOnBoard = true
+        displayTools()
 
         // Starts the timer
         onTimer()
@@ -353,11 +356,10 @@ function onCellClicked(elCell,i,j) {
 
 
     /// -----  Opening process of normal cells ----
-
+    
     // Checks that the cell is not shown yet
-    if (!gBoard[i][j].isShown && !gBoard[i][j].isMarked &&!gIsHintModeOn) {
+    if (!gBoard[i][j].isShown && !gBoard[i][j].isMarked && !gIsHintModeOn) {
         // Checks that the cell does not contain a mine
-
         if (!gBoard[i][j].isMine) {
             if (gBoard[i][j].minesAroundCount === 0) {
                 // A function that opens all neighboring cells to a cell that has zero neighboring cells with a mine
@@ -379,6 +381,11 @@ function onCellClicked(elCell,i,j) {
 
                 // Updates the opened cell in the history array
                 gHistory.push({elCell: elCell, i: i, j: j})
+            }
+
+            //If after clicking a safe cell button if the highlighted safe cell is clicked this setting will remove the color class from it
+            if (elCell.classList.contains('safe-cell')) {
+                elCell.classList.remove('safe-cell')
             }
 
             // Updates the smiley emoji
@@ -540,6 +547,7 @@ function checkGameOver()  {
         UpdateLoseDOM()
         updateRestartBtnSmiley('lose')
         stopTimer()
+        displayTools()
 
      }else if ( gGame.markedCount === gLevel.MINES &&
         gGame.shownCount + gGame.markedCount === boardSize){
@@ -549,6 +557,7 @@ function checkGameOver()  {
       
         updateRestartBtnSmiley('win')
         stopTimer()
+        displayTools()
 
         // When the player wins saves his data to update his score
         makePlayerData()

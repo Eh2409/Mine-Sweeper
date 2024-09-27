@@ -8,8 +8,8 @@
 }
 
 .dark-mode{
-  --site-background: rgb(60, 62, 167);
-  --cell-coverd:  rgb(0, 57, 243);
+  --site-background: rgb(57, 57, 109);
+  --cell-coverd:  rgb(35, 67, 173);
   --cell: rgb(104, 111, 255);
   --dark-mode-btn:  rgb(255, 136, 0);
   --dark-mode-font-color: rgb(250, 238, 169);
@@ -42,6 +42,10 @@ body {
 
   button:hover{
     filter: brightness(1.1)
+   }
+
+   button:active{
+    filter: brightness(0.9)
    }
 
   
@@ -111,6 +115,7 @@ body {
     width: 700px;
     margin: auto;
     font-weight: bold;
+    transition: dispaly 2s;
   }
 
   .tools div {
@@ -151,7 +156,15 @@ body {
     padding: 7px;
     font-weight: bold;
   }
-  
+
+  .tools span :hover {
+    filter: brightness(1.2)
+  }
+
+  .tools span :active{
+    filter: brightness(0.9)
+   }
+
 
   /* ------------- levels -------- */
 
@@ -196,7 +209,6 @@ body {
   .play-set-main{
     background-color: rgb(2, 69, 255);
   }
-
 
   /* ------ board ----- */
 
@@ -274,3 +286,26 @@ body {
   .hide {
     display: none;
   }
+
+
+  .not-active {
+    filter: grayscale(100%);
+  }
+
+  .not-active  button {
+    background-color: rgb(83, 83, 74);
+    cursor:default;
+  }
+
+  .not-active  span {
+    cursor:default;
+    filter: grayscale(100%);
+  }
+
+  .not-active  button:hover,
+  .not-active  button:active,
+  .not-active span :hover,
+  .not-active span :active{
+    filter: none
+  }
+

@@ -93,5 +93,6 @@ function onPlaySetMineMode(elPlaySetMineBtn) {
     gGame.isOn = true
     gIsMineOnBoard = true
 
+    displayTools()
     onTimer()
 }

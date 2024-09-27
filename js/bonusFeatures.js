@@ -129,6 +129,7 @@ function hideCells(cellsArray) {
 
 function onSafeClick() {
     if (!gGame.isOn) return
+    if (!gIsMineOnBoard) return
     if (gLevel.SAFE_CLICK === 0) return
 
     // Finds a safe cell to click that doesn't have a mine in it
@@ -174,6 +175,15 @@ function findSafeCell() {
 }
 
 /// ----- MEGA HINT -----
+
+function megaHintCount(diff = 0) {
+    // Updates the amount of safe click
+    gLevel.MEGA_HINT-=diff
+    
+    // Updates the DOM
+    const elMegaHint = document.querySelector('.count-mega-hint')
+    elMegaHint.innerText = gLevel.MEGA_HINT
+}
 
 function onMegaHint() {
     if (!gIsMineOnBoard) return
@@ -228,7 +238,8 @@ function megaHintShow(firstPos, lastPos) {
       }  
     }
     
-    gLevel.MEGA_HINT--
+    
+    megaHintCount(1)
     gIsMegaHintOn = false
     gClickCount = 0
     gMegaHintPose = []
@@ -483,4 +494,21 @@ function onDarkMode(elDarkMode) {
         elDarkMode.innerHTML = 'Dark Mode🌙'
     }
 
+}
+
+// ------ display tools ------
+
+function displayTools() {
+    const elTools = document.querySelector('.tools')
+
+    if (!gGame.isOn) {
+        elTools.classList.add('not-active')
+        return
+    }
+
+    if (gIsMineOnBoard) {
+        elTools.classList.remove('not-active')
+    } else if (!gIsMineOnBoard){
+        elTools.classList.add('not-active')
+    }
 }
